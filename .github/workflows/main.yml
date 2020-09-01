@@ -1,4 +1,4 @@
-iname: Test
+name: Test
 
 on: [push]
 
@@ -41,7 +41,7 @@ jobs:
       - name: "Install dependencies"
         if: steps.cache-venv.outputs.cache-hit != 'true'
         run: |
-          pipenv install --dev --skip-lock Django
+          pipenv install --dev --skip-lock
       - name: "Create Django project"
         run: |
           pipenv run django-admin startproject mysite
