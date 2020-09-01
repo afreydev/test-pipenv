@@ -1,0 +1,48 @@
+iname: Test
+
+on: [push]
+
+env:
+  SERVER_ENV: CI
+
+  PIPENV_SKIP_LOCK: 1
+  PIPENV_VENV_IN_PROJECT: 1
+  PIPENV_IGNORE_VIRTUALENVS: 1
+
+jobs:
+
+  test_django:
+    name: Django Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+          architecture: 'x64'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y python3-dev libpango1.0-0 python-psycopg2 libpq-dev
+          python -m pip install --upgrade pip pipenv
+      - name: "Cache virtualenv dir"
+        uses: actions/cache@v1
+        id: cache-venv
+        with:
+          path: .venv
+          key: ${{ runner.os }}-${{ hashFiles('Pipfile') }}-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ hashFiles('Pipfile') }}-
+            ${{ runner.os }}-
+      - name: "Install dependencies"
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --dev --skip-lock Django
+      - name: "Create Django project"
+        run: |
+          pipenv run django-admin startproject mysite
+
