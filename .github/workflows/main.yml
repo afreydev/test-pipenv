@@ -45,4 +45,5 @@ jobs:
       - name: "Create Django project"
         run: |
           pipenv run django-admin startproject mysite
+          ls -al
 
